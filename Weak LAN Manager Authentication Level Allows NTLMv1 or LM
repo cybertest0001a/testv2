@@ -1,0 +1,41 @@
+To check the LAN Manager Authentication Level and see if NTLMv1 or LM is allowed, you can use PowerShell to query the local security policy or Group Policy settings.
+
+### Checking via PowerShell
+
+1. **Open PowerShell as Administrator**:
+   - Press `Win + X` and select `Windows PowerShell (Admin)`.
+
+2. **Check LAN Manager Authentication Level**:
+   Use the following command to retrieve the setting:
+
+   ```powershell
+   $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
+   $regValue = "LmCompatibilityLevel"
+
+   if (Test-Path $regPath) {
+       $lmLevel = Get-ItemProperty -Path $regPath -Name $regValue | Select-Object -ExpandProperty $regValue
+       switch ($lmLevel) {
+           0 { $levelDescription = "Send LM & NTLM responses" }
+           1 { $levelDescription = "Send LM & NTLM - use NTLMv2 session security if negotiated" }
+           2 { $levelDescription = "Send NTLM response only" }
+           3 { $levelDescription = "Send NTLMv2 response only" }
+           4 { $levelDescription = "Send NTLMv2 response only. Refuse LM" }
+           5 { $levelDescription = "Send NTLMv2 response only. Refuse LM & NTLM" }
+           default { $levelDescription = "Unknown or undefined level" }
+       }
+       Write-Output "LAN Manager Authentication Level: $lmLevel - $levelDescription"
+   } else {
+       Write-Output "The registry path does not exist."
+   }
+   ```
+
+### Explanation
+
+- **LmCompatibilityLevel**: Determines the authentication protocols allowed.
+  - Levels 0 and 1 allow NTLMv1 or LM, which are less secure.
+  - Levels 4 and 5 are more secure, refusing LM and/or NTLM.
+
+### Notes
+
+- Ensure your system's security policy aligns with best practices by using NTLMv2 or higher.
+- Adjust settings through Group Policy if needed for compliance.
