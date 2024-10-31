@@ -1,0 +1,37 @@
+To check for excessive permissions on key domain objects, you can use PowerShell with the Active Directory module to analyze permissions. Here’s a general approach:
+
+1. **Open PowerShell as Administrator**:
+   - Press `Win + X` and select `Windows PowerShell (Admin)`.
+
+2. **Import the Active Directory Module**:
+   ```powershell
+   Import-Module ActiveDirectory
+   ```
+
+3. **Identify Key Domain Objects**:
+   Determine which objects you want to check, such as Domain Controllers, critical groups, or organizational units (OUs).
+
+4. **Check Permissions**:
+   Use PowerShell to retrieve access control lists (ACLs) for these objects.
+
+   ```powershell
+   # Example for a key domain object, like "Domain Admins"
+   $object = Get-ADGroup -Identity "Domain Admins"
+   $acl = Get-ACL -Path ("AD:\" + $object.DistinguishedName)
+
+   # Display permissions
+   foreach ($ace in $acl.Access) {
+       Write-Output "Identity: $($ace.IdentityReference) - Permissions: $($ace.ActiveDirectoryRights)"
+   }
+   ```
+
+5. **Analyze Permissions**:
+   Review the output to identify users or groups with potentially excessive permissions, such as `Write`, `FullControl`, or `Modify`.
+
+### Notes:
+
+- **Review Carefully**: Look for accounts that should not have elevated permissions.
+- **Adjust as Needed**: Modify the script for different objects or permissions based on your security policies.
+- **Security Tools**: Consider using security tools for a more comprehensive analysis of permission configurations. 
+
+This approach provides a basic check and may need to be tailored to your environment's specific security requirements.
