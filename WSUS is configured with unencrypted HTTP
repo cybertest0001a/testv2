@@ -1,0 +1,43 @@
+To check if WSUS is configured with unencrypted HTTP instead of HTTPS on a Windows client, you can follow these steps:
+
+1. **Check Windows Update Registry Settings:**
+
+   1. Press `Win + R` to open the Run dialog.
+   2. Type `regedit` and press Enter to open the Registry Editor.
+   3. Navigate to the following key:
+
+      ```
+      HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+      ```
+
+   4. Look for the value named `WUServer`.
+   5. If the URL starts with `http://`, then WSUS is configured with unencrypted HTTP. If it starts with `https://`, it is using HTTPS.
+
+2. **Use PowerShell:**
+
+   You can also use PowerShell to check the configuration:
+
+   ```powershell
+   $wsusServer = Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name WUServer
+   if ($wsusServer.WUServer -like "http://*") {
+       Write-Host "WSUS is configured with unencrypted HTTP."
+   } else {
+       Write-Host "WSUS is configured with HTTPS."
+   }
+   ```
+
+3. **Group Policy Editor (if applicable):**
+
+   If your organization uses Group Policy to configure WSUS, you can check the settings:
+
+   1. Press `Win + R`, type `gpedit.msc`, and press Enter.
+   2. Navigate to:
+
+      ```
+      Computer Configuration -> Administrative Templates -> Windows Components -> Windows Update
+      ```
+
+   3. Look for the policy named **Specify intranet Microsoft update service location**.
+   4. Check the URL specified. If it starts with `http://`, then it’s using unencrypted HTTP.
+
+These steps should help you determine whether WSUS is configured with HTTP or HTTPS on your Windows client.
