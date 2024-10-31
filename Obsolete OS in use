@@ -1,0 +1,35 @@
+Here’s the updated script to include Windows Server 2003 and 2008 as obsolete:
+
+```powershell
+# Define obsolete versions for both clients and servers
+$obsoleteVersions = @("5.2", "6.0", "6.1", "6.2", "6.3") # Server 2003 (5.2), Server 2008 (6.0), Windows 7 (6.1), Windows 8 (6.2), Server 2012 R2 (6.3)
+
+# Retrieve all computers in the domain with their OS information
+$computers = Get-ADComputer -Filter * -Property OperatingSystem, OperatingSystemVersion
+
+# Check each computer for obsolete OS versions
+foreach ($computer in $computers) {
+    $osVersion = $computer.OperatingSystemVersion
+    if ($obsoleteVersions -contains $osVersion) {
+        Write-Output "Obsolete OS detected: $($computer.Name) is running version $osVersion"
+    }
+}
+```
+
+### Steps:
+
+1. **Open PowerShell as Administrator**:
+   - Press `Win + X` and select `Windows PowerShell (Admin)`.
+
+2. **Import the Active Directory Module**:
+   ```powershell
+   Import-Module ActiveDirectory
+   ```
+
+3. **Run the Script**:
+   Copy and paste the script into the PowerShell window to execute it.
+
+### Notes:
+
+- The script now includes checks for Windows Server 2003 (5.2) and Windows Server 2008 (6.0).
+- Adjust the list of obsolete versions as needed based on your organization's policy.
