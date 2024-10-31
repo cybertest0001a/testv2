@@ -1,0 +1,31 @@
+To check for admin accounts that do not have the "This account is sensitive and cannot be delegated" flag enabled, you can use PowerShell on a Windows client. Here’s how:
+
+1. **PowerShell Script to Check Accounts:**
+
+   Use the following PowerShell command to find admin accounts without the delegation flag:
+
+   ```powershell
+   # Get all admin accounts
+   $adminAccounts = Get-ADUser -Filter 'AdminCount -eq 1' -Properties SamAccountName, UserAccountControl
+
+   # Check for accounts without the 'sensitive and cannot be delegated' flag
+   $vulnerableAccounts = $adminAccounts | Where-Object {
+       -not($_.UserAccountControl -band 0x100000)
+   }
+
+   # Output accounts
+   $vulnerableAccounts | Select-Object SamAccountName
+   ```
+
+2. **Explanation:**
+
+   - The `AdminCount` property is typically set to `1` for administrative accounts.
+   - The `UserAccountControl` flag `0x100000` (1048576 in decimal) indicates that the account is sensitive and cannot be delegated.
+   - The script filters out accounts missing this flag.
+
+3. **Prerequisites:**
+
+   - Ensure you have the Active Directory PowerShell module installed.
+   - Run the script with appropriate privileges to access Active Directory user properties.
+
+This will list admin accounts that need the delegation protection flag enabled.
