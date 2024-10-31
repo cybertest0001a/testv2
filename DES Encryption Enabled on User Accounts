@@ -1,0 +1,29 @@
+To check for accounts with DES encryption enabled, you can use PowerShell to query Active Directory. Here’s how:
+
+1. **Open PowerShell as Administrator**:
+   - Press `Win + X` and select `Windows PowerShell (Admin)`.
+
+2. **Import the Active Directory Module**:
+   Ensure the Active Directory module is available:
+
+   ```powershell
+   Import-Module ActiveDirectory
+   ```
+
+3. **Find Accounts with DES Encryption Enabled**:
+   Use the following script:
+
+   ```powershell
+   $desEnabledAccounts = Get-ADUser -Filter {UserAccountControl -band 0x200000} -Properties UserAccountControl
+
+   $desEnabledAccounts | Select-Object SamAccountName, Name
+   $count = $desEnabledAccounts.Count
+   Write-Output "Number of accounts with DES enabled: $count"
+   ```
+
+### Explanation
+
+- **UserAccountControl 0x200000**: This flag indicates DES encryption is enabled.
+- The script lists accounts with this flag and counts them.
+
+This will help you identify accounts with DES encryption enabled in your environment.
