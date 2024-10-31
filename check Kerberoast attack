@@ -1,0 +1,53 @@
+To check for vulnerabilities to the Kerberoast attack, you can use the following PowerShell script. This will help identify accounts in administrative groups with Service Principal Names (SPNs) set, which are vulnerable to Kerberoasting.
+
+1. **Open PowerShell as Administrator**:
+   - Press `Win + X` and select `Windows PowerShell (Admin)`.
+
+2. **Import the Active Directory Module**:
+   Ensure the Active Directory module is available.
+
+   ```powershell
+   Import-Module ActiveDirectory
+   ```
+
+3. **Identify Admin Groups**:
+   Retrieve the list of members from key administrative groups.
+
+   ```powershell
+   $adminGroups = @("Domain Admins", "Enterprise Admins")
+   $adminMembers = @()
+
+   foreach ($group in $adminGroups) {
+       $members = Get-ADGroupMember -Identity $group -Recursive
+       $adminMembers += $members
+   }
+
+   $adminMembers = $adminMembers | Select-Object -Unique
+   ```
+
+4. **Check for SPNs**:
+   For each admin account, check if they have an SPN set.
+
+   ```powershell
+   $vulnerableAccounts = @()
+
+   foreach ($admin in $adminMembers) {
+       $user = Get-ADUser -Identity $admin.SamAccountName -Properties ServicePrincipalName
+       if ($user.ServicePrincipalName.Count -gt 0) {
+           $vulnerableAccounts += $user
+       }
+   }
+
+   $vulnerableAccounts | Select-Object SamAccountName, Name, ServicePrincipalName
+   ```
+
+5. **Display Results**:
+   Output the results to see which admin accounts are vulnerable.
+
+   ```powershell
+   $count = $vulnerableAccounts.Count
+   Write-Output "Number of vulnerable accounts: $count"
+   $vulnerableAccounts | Format-Table SamAccountName, Name, ServicePrincipalName
+   ```
+
+This script identifies administrative accounts with SPNs, which can potentially be kerberoasted. Adjust the admin groups as necessary based on your environment.
