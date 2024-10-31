@@ -1,0 +1,20 @@
+# Import Active Directory module
+Import-Module ActiveDirectory
+
+# Get all users and computers with delegation enabled
+$delegatedUsers = Get-ADUser -Filter 'msDS-AllowedToDelegateTo -ne $null' -Properties msDS-AllowedToDelegateTo
+$delegatedComputers = Get-ADComputer -Filter 'msDS-AllowedToDelegateTo -ne $null' -Properties msDS-AllowedToDelegateTo
+
+# Combine results
+$delegatedObjects = $delegatedUsers + $delegatedComputers
+
+# Check for unknown (or unexpected) accounts
+foreach ($obj in $delegatedObjects) {
+    $delegatedAccounts = $obj.'msDS-AllowedToDelegateTo'
+    foreach ($account in $delegatedAccounts) {
+        # Replace "ExpectedAccount1", "ExpectedAccount2" with known accounts
+        if ($account -notin @("ExpectedAccount1", "ExpectedAccount2")) {
+            Write-Host "Unknown account in delegation for $($obj.SamAccountName): $account"
+        }
+    }
+}
