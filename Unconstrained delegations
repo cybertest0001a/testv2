@@ -1,0 +1,10 @@
+# Import Active Directory module
+Import-Module ActiveDirectory
+
+# Find accounts with unconstrained delegation
+$unconstrainedDelegationAccounts = Get-ADUser -Filter 'UserAccountControl -band 0x80000' -Properties SamAccountName
+$unconstrainedDelegationComputers = Get-ADComputer -Filter 'UserAccountControl -band 0x80000' -Properties SamAccountName
+
+# Output accounts
+$unconstrainedDelegationAccounts | Select-Object SamAccountName
+$unconstrainedDelegationComputers | Select-Object SamAccountName
