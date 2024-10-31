@@ -1,7 +1,0 @@
-$servers = @("DC1", "DC2") # Replace with your domain controllers
-foreach ($server in $servers) {
-    $result = Invoke-Command -ComputerName $server -ScriptBlock {
-        (Get-SmbServerConfiguration).EnableSMB1Protocol
-    }
-    Write-Host "$server: SMB v1 Enabled = $result"
-}

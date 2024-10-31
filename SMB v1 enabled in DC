@@ -1,0 +1,42 @@
+To check if Domain Controllers are vulnerable to the SMB v1 vulnerability without using WinRM, you can use PowerShell locally on a Windows client. Here's how:
+
+1. **PowerShell Script to Check SMB v1:**
+
+   Run the following PowerShell command to check if SMB v1 is enabled:
+
+   ```powershell
+   Get-WindowsFeature -Name FS-SMB1
+   ```
+
+   If the `Display Name` shows `Installed`, then SMB v1 is enabled and potentially vulnerable.
+
+2. **Registry Check:**
+
+   You can also manually check the registry setting:
+
+   1. Press `Win + R`, type `regedit`, and press Enter.
+   2. Navigate to:
+
+      ```
+      HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
+      ```
+
+   3. Look for a value named `SMB1`. If it’s set to `1`, SMB v1 is enabled. If it’s `0` or missing, SMB v1 is disabled.
+
+3. **Network Check Using PowerShell:**
+
+   If you have network access to the Domain Controllers, you can remotely check if SMB v1 is enabled using PowerShell:
+
+   ```powershell
+   $servers = @("DC1", "DC2") # Replace with your domain controllers
+   foreach ($server in $servers) {
+       $result = Invoke-Command -ComputerName $server -ScriptBlock {
+           (Get-SmbServerConfiguration).EnableSMB1Protocol
+       }
+       Write-Host "$server: SMB v1 Enabled = $result"
+   }
+   ```
+
+   This script requires appropriate permissions and network access.
+
+Make sure you have administrative privileges to run these commands and check these settings. If SMB v1 is enabled, it's recommended to disable it to mitigate vulnerabilities.
