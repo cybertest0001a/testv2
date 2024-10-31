@@ -1,0 +1,35 @@
+To check for accounts with SID History matching a specific domain, you can use PowerShell on a Windows client. Here's how to do it:
+
+### Using PowerShell
+
+1. **Open PowerShell as Administrator.**
+
+2. **Use the Active Directory Module:**
+
+   First, ensure the Active Directory module is installed. If not, install the Remote Server Administration Tools (RSAT).
+
+3. **Run the Following Command:**
+
+   ```powershell
+   Import-Module ActiveDirectory
+
+   Get-ADUser -Filter {SIDHistory -ne $null} -Properties SIDHistory | 
+   Where-Object { $_.SIDHistory -match "S-1-5-21-427" } |
+   Select-Object Name, SIDHistory
+   ```
+
+   Replace `"S-1-5-21-427"` with the actual domain SID you are looking for.
+
+### Explanation
+
+- **Get-ADUser -Filter {SIDHistory -ne $null}**: Retrieves all users with a non-null SID History.
+- **Where-Object { $_.SIDHistory -match "S-1-5-21-831" }**: Filters users whose SID History matches the specified domain SID.
+
+### Prerequisites
+
+- Ensure you have the necessary permissions to query Active Directory.
+- The script should be run on a machine that can communicate with a Domain Controller.
+
+### Mitigation
+
+If unauthorized SID History is found, investigate and remove it to prevent potential security risks.
