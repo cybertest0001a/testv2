@@ -1,0 +1,26 @@
+To check if a DNS zone is configured with insecure updates, you can use the `dnscmd` tool on a Windows client. Here's how:
+
+1. **Open Command Prompt as Administrator**:
+   - Press `Win + X` and select `Command Prompt (Admin)`.
+
+2. **Use `dnscmd` to Check Zone Properties**:
+   Run the following command to see the configuration of a specific DNS zone:
+
+   ```shell
+   dnscmd /zoneinfo <ZoneName>
+   ```
+
+   Replace `<ZoneName>` with the name of the DNS zone you want to check.
+
+3. **Review the Output**:
+   Look for the "AllowUpdate" setting in the output:
+   - `None`: No dynamic updates.
+   - `Secure`: Only secure updates are allowed.
+   - `Any`: Insecure updates are allowed.
+
+If the output shows `Any`, the DNS zone is configured to allow insecure updates, which can pose a security risk.
+
+### Notes:
+
+- **Permissions**: Ensure you have the necessary permissions to run `dnscmd`.
+- **Best Practices**: Configure DNS zones to allow only secure updates to enhance security.
