@@ -1,0 +1,35 @@
+To check for domains used in `sIDHistory`, you can use PowerShell to query Active Directory. Here's how to do it:
+
+1. **Open PowerShell as Administrator**:
+   - Press `Win + X` and select `Windows PowerShell (Admin)`.
+
+2. **Import the Active Directory Module**:
+   Ensure the Active Directory module is available.
+
+   ```powershell
+   Import-Module ActiveDirectory
+   ```
+
+3. **Search for sIDHistory Attributes**:
+   Use the following script to find users or groups with `sIDHistory` set:
+
+   ```powershell
+   $sidHistoryAccounts = Get-ADUser -Filter {sIDHistory -ne "$null"} -Properties sIDHistory
+   $sidHistoryAccounts += Get-ADGroup -Filter {sIDHistory -ne "$null"} -Properties sIDHistory
+
+   foreach ($account in $sidHistoryAccounts) {
+       Write-Output "Account with sIDHistory: $($account.SamAccountName)"
+       foreach ($sid in $account.sIDHistory) {
+           $domainSid = ($sid -split "-")[0..6] -join "-"
+           Write-Output "Domain SID used in sIDHistory: $domainSid"
+       }
+   }
+   ```
+
+### Explanation:
+
+- **Get-ADUser** and **Get-ADGroup**: Retrieves users and groups with `sIDHistory`.
+- **sIDHistory**: Contains security identifiers from previous domains or forests.
+- **Domain SID**: Extracted from the `sIDHistory` for analysis.
+
+This script will list accounts with `sIDHistory` and display the domain SIDs being used. Adjust according to your needs and ensure you have appropriate permissions to query this information.
